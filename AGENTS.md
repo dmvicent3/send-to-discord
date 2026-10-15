@@ -4,7 +4,7 @@ Personal Firefox (MV3) extension: a button on each X post that sends its link, r
 
 ## Done means green
 
-`node --test` passes and `web-ext lint` is clean.
+`npm test` passes and `npm run lint` reports 0 errors and 0 warnings.
 
 ## Shape
 
