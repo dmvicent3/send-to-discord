@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root { color-scheme: light dark; }
+      body { font: 14px system-ui, sans-serif; margin: 16px; max-width: 520px; }
+      label { display: block; margin-bottom: 6px; font-weight: 600; }
+      input { box-sizing: border-box; width: 100%; padding: 6px 8px; font: inherit; }
+      .row { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+      button { padding: 6px 14px; font: inherit; cursor: pointer; }
+      #status { opacity: 0.8; }
+    </style>
+  </head>
+  <body>
+    <label for="webhook">Discord webhook URL</label>
+    <input id="webhook" type="url" placeholder="https://discord.com/api/webhooks/…" spellcheck="false" />
+    <div class="row">
+      <button id="save">Save</button>
+      <button id="test">Test</button>
+      <span id="status" role="status"></span>
+    </div>
+    <script src="webhook.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>
