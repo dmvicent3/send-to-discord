@@ -14,7 +14,7 @@ Personal Firefox (MV3) extension: a button on each X post that sends its link, r
 
 ## Design docs
 
-Spec: `docs/superpowers/specs/2026-10-16-x-to-discord-design.md`.
+Spec and plan: `docs/superpowers/specs/2026-10-16-x-to-discord-design.md`, `docs/superpowers/plans/2026-10-16-x-to-discord.md`.
 
 ## Task board
 
