@@ -7,8 +7,6 @@ async function storedWebhook() {
 
 browser.runtime.onMessage.addListener(async (message) => {
   switch (message?.type) {
-    case "has-webhook":
-      return (await storedWebhook()) !== null;
     case "send": {
       const webhook = await storedWebhook();
       if (!webhook) return { ok: false, reason: "no webhook" };
