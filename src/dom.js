@@ -37,4 +37,10 @@ function findSlot(group, share) {
   return slot;
 }
 
-if (typeof module !== "undefined") module.exports = { findPermalink, findActionBar, findSlot };
+// Horizontal space X leaves between the previous action and share, so our button can repeat it.
+function slotGap(prevRect, slotRect, fallback = 12) {
+  const gap = prevRect ? Math.round(slotRect.left - prevRect.right) : 0;
+  return gap > 0 ? gap : fallback;
+}
+
+if (typeof module !== "undefined") module.exports = { findPermalink, findActionBar, findSlot, slotGap };
