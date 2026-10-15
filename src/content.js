@@ -35,15 +35,6 @@ browser.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && "webhookUrl" in changes) hasWebhook = Boolean(changes.webhookUrl.newValue);
 });
 
-function findPermalink(article) {
-  for (const anchor of article.querySelectorAll('a[href*="/status/"]')) {
-    if (anchor.querySelector(":scope > time") && anchor.closest("article") === article) {
-      return anchor.href;
-    }
-  }
-  return location.pathname.includes("/status/") ? location.href : null;
-}
-
 function render(btn, state, reason = "") {
   const wrapper = btn.closest(".x2d-btn");
   wrapper.dataset.state = state;
@@ -95,14 +86,14 @@ function wireButton(btn, article) {
 }
 
 function injectButton(article) {
-  const group = article.querySelector('[role="group"]');
+  const group = findActionBar(article);
   if (!group || group.querySelector(".x2d-btn")) return;
   const buttons = group.querySelectorAll("button");
   const share = buttons[buttons.length - 1];
   const original = share?.querySelector("svg");
   if (!original) return;
 
-  const slot = share.parentElement === group ? share : share.parentElement;
+  const slot = findSlot(group, share);
   const wrapper = slot.cloneNode(true);
   for (const el of [wrapper, ...wrapper.querySelectorAll("*")]) {
     for (const attr of [...el.attributes]) {

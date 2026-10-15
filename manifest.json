@@ -23,7 +23,7 @@
   "content_scripts": [
     {
       "matches": ["*://x.com/*", "*://twitter.com/*", "*://mobile.twitter.com/*"],
-      "js": ["src/fxurl.js", "src/button-state.js", "src/content.js"],
+      "js": ["src/fxurl.js", "src/dom.js", "src/button-state.js", "src/content.js"],
       "run_at": "document_idle"
     }
   ]
