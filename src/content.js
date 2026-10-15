@@ -110,12 +110,17 @@ function injectButton(article) {
   svg.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "path"));
   wrapper.querySelector("svg").replaceWith(svg);
 
-  // Inside a shared container (bookmark + share) the spacing sits on the previous item, not on share; repeat it.
-  if (slot.parentElement !== group) {
-    const prev = slot.previousElementSibling;
-    wrapper.style.marginLeft = `${slotGap(prev?.getBoundingClientRect() ?? null, slot.getBoundingClientRect())}px`;
-  }
   slot.after(wrapper);
+  // Share carries no trailing spacing (it was last), so match the bookmark→share icon spacing by measuring.
+  const prevIcon = buttons[buttons.length - 2]?.querySelector("svg");
+  if (prevIcon) {
+    const centre = (el) => {
+      const rect = el.getBoundingClientRect();
+      return rect.left + rect.width / 2;
+    };
+    const shift = iconShift(centre(prevIcon), centre(original), centre(svg));
+    if (shift > 0) wrapper.style.marginLeft = `${shift}px`;
+  }
   wireButton(wrapper.matches("button") ? wrapper : wrapper.querySelector("button"), article);
 }
 

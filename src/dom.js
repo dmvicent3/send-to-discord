@@ -37,10 +37,9 @@ function findSlot(group, share) {
   return slot;
 }
 
-// Horizontal space X leaves between the previous action and share, so our button can repeat it.
-function slotGap(prevRect, slotRect, fallback = 12) {
-  const gap = prevRect ? Math.round(slotRect.left - prevRect.right) : 0;
-  return gap > 0 ? gap : fallback;
+// Pixels to move our icon so its distance from share equals share's distance from the previous icon (x = icon centres).
+function iconShift(prevX, shareX, ourX) {
+  return Math.round(shareX - prevX - (ourX - shareX));
 }
 
-if (typeof module !== "undefined") module.exports = { findPermalink, findActionBar, findSlot, slotGap };
+if (typeof module !== "undefined") module.exports = { findPermalink, findActionBar, findSlot, iconShift };

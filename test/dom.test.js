@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { findPermalink, findActionBar, findSlot, slotGap } = require("../src/dom.js");
+const { findPermalink, findActionBar, findSlot, iconShift } = require("../src/dom.js");
 
 // Minimal element stand-in exposing the DOM properties dom.js relies on.
 function h(tag, attrs = {}, ...children) {
@@ -77,12 +77,13 @@ test("findSlot returns the button when it sits directly in the group", () => {
   assert.equal(findSlot(bar, share), share);
 });
 
-test("slotGap measures the space between the previous action and share", () => {
-  assert.equal(slotGap({ right: 300 }, { left: 312.4 }), 12);
+test("iconShift is the extra offset that matches the previous icon spacing", () => {
+  // bookmark at 15, share at 50 (35 apart); ours sits at 75 (25 apart) -> move 10 right
+  assert.equal(iconShift(15, 50, 75), 10);
+  assert.equal(iconShift(15, 50, 85), 0);
+  assert.equal(iconShift(15, 50, 90.4), -5);
 });
 
-test("slotGap falls back when there is no previous action or no measurable gap", () => {
-  assert.equal(slotGap(null, { left: 312 }), 12);
-  assert.equal(slotGap({ right: 0 }, { left: 0 }), 12);
-  assert.equal(slotGap({ right: 320 }, { left: 312 }), 12);
+test("iconShift is 0 when nothing is laid out", () => {
+  assert.equal(iconShift(0, 0, 0), 0);
 });
