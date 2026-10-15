@@ -110,17 +110,19 @@ function injectButton(article) {
   svg.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "path"));
   wrapper.querySelector("svg").replaceWith(svg);
 
+  // Overlay: take no layout space (X's stretchy actions would shrink), sit one icon-spacing right of share.
+  const centre = (el) => {
+    const rect = el?.getBoundingClientRect();
+    return rect ? rect.left + rect.width / 2 : 0;
+  };
+  const spacing = iconSpacing(centre(buttons[buttons.length - 2]?.querySelector("svg")), centre(original));
+  const slotRight = slot.parentElement.clientWidth - slot.offsetLeft - slot.offsetWidth;
+  Object.assign(wrapper.style, {
+    position: "absolute",
+    top: `${slot.offsetTop}px`,
+    right: `${slotRight - spacing}px`,
+  });
   slot.after(wrapper);
-  // Share carries no trailing spacing (it was last), so match the bookmark→share icon spacing by measuring.
-  const prevIcon = buttons[buttons.length - 2]?.querySelector("svg");
-  if (prevIcon) {
-    const centre = (el) => {
-      const rect = el.getBoundingClientRect();
-      return rect.left + rect.width / 2;
-    };
-    const shift = iconShift(centre(prevIcon), centre(original), centre(svg));
-    if (shift > 0) wrapper.style.marginLeft = `${shift}px`;
-  }
   wireButton(wrapper.matches("button") ? wrapper : wrapper.querySelector("button"), article);
 }
 

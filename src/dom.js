@@ -37,9 +37,10 @@ function findSlot(group, share) {
   return slot;
 }
 
-// Pixels to move our icon so its distance from share equals share's distance from the previous icon (x = icon centres).
-function iconShift(prevX, shareX, ourX) {
-  return Math.round(shareX - prevX - (ourX - shareX));
+// Distance between the previous action's icon centre and share's; our icon sits that far right of share.
+function iconSpacing(prevX, shareX, fallback = 36) {
+  const spacing = Math.round(shareX - prevX);
+  return spacing > 0 ? spacing : fallback;
 }
 
-if (typeof module !== "undefined") module.exports = { findPermalink, findActionBar, findSlot, iconShift };
+if (typeof module !== "undefined") module.exports = { findPermalink, findActionBar, findSlot, iconSpacing };
