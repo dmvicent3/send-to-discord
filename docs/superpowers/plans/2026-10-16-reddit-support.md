@@ -166,9 +166,9 @@
 **Files:**
 - Modify: `manifest.json`, `package.json`, `README.md`, `AGENTS.md`; vault `AGENTS.md`; vault board
 
-- [ ] **Step 1: Manifest** `name: "Send to Discord"`, `description: "Adds a button to X and Reddit posts that sends them to a Discord webhook."`, `version: "0.2.0"`; gecko id unchanged. `package.json` `name: "send-to-discord"`.
+- [ ] **Step 1: Manifest** `name: "Send to Discord"`, `description: "Adds a button to X and Reddit posts that sends them to a Discord webhook."`, `version: "0.2.0"`; gecko id unchanged. `package.json` `name: "send-to-discord"`. `src/options.js` test message → `"Send to Discord: test message"`; project `AGENTS.md` title → `# Send to Discord`.
 - [ ] **Step 2: README** rewritten for both sites (Reddit section: needs the old layout, which RES provides; what each post type sends).
 - [ ] **Step 3: Run `npm test` and `npm run lint`.** Expected: all pass, 0/0/0. **Commit** `chore: rename to Send to Discord`, merge the branch to `main`, `git push`.
 - [ ] **Step 4: GitHub:** `gh repo rename send-to-discord -R dmvicent3/x-to-discord`, then `git remote set-url origin https://github.com/dmvicent3/send-to-discord.git`; `git fetch` succeeds.
-- [ ] **Step 5: Folder** (ask the user to close editors/terminals in it first): rename `Desktop\Projects\x-to-discord` → `send-to-discord`; update the project `AGENTS.md` board path, the vault `AGENTS.md` project line, and move the vault board to `Send to Discord/Send to Discord Kanban.md`.
+- [ ] **Step 5: Folder** (ask the user to close editors/terminals in it first): rename `Desktop\Projects\x-to-discord` → `send-to-discord`; update the project path in the vault `AGENTS.md` project line (the vault board already moved to `Send to Discord/Send to Discord Kanban.md` on 2026-10-16).
 - [ ] **Step 6: Sign** (user, with AMO keys): `npm run sign`, install the `0.2.0` `.xpi` over the existing add-on; the webhook setting survives (same id).

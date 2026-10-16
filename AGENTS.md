@@ -19,4 +19,4 @@ Personal Firefox (MV3) extension: a button on each X post that sends its link, r
 
 ## Task board
 
-`C:\Users\Utilizador\Documents\Obsidian Vault\X to Discord\X to Discord Kanban.md` (lanes: todo, in-progress, done). Check it when starting; move cards as status changes.
+`C:\Users\Utilizador\Documents\Obsidian Vault\Send to Discord\Send to Discord Kanban.md` (lanes: todo, in-progress, done). Check it when starting; move cards as status changes.
