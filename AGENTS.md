@@ -14,7 +14,8 @@ Personal Firefox (MV3) extension: a button on each X post that sends its link, r
 
 ## Design docs
 
-Spec and plan: `docs/superpowers/specs/2026-10-16-x-to-discord-design.md`, `docs/superpowers/plans/2026-10-16-x-to-discord.md`.
+- X MVP: `docs/superpowers/specs/2026-10-16-x-to-discord-design.md`, `docs/superpowers/plans/2026-10-16-x-to-discord.md`
+- Reddit support and rename: `docs/superpowers/specs/2026-10-16-reddit-support-design.md`, `docs/superpowers/plans/2026-10-16-reddit-support.md`
 
 ## Task board
 
