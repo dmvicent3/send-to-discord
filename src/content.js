@@ -87,18 +87,21 @@ function wireButton(btn, article) {
 
 // Share carries no trailing spacing (it was last), so set our margin until share→ours matches prev→share.
 // Re-measures a few frames because adding width makes X's bar redistribute space.
-function alignToShare(wrapper, prevIcon, shareIcon, ourIcon, tries = 4) {
-  if (!prevIcon || tries === 0) return;
+// X re-renders its buttons, so the icons are looked up afresh each frame and skipped until laid out.
+function alignToShare(group, wrapper, tries = 6) {
+  if (tries === 0) return;
   requestAnimationFrame(() => {
-    const centre = (el) => {
-      const rect = el.getBoundingClientRect();
-      return rect.left + rect.width / 2;
-    };
-    const shift = iconShift(centre(prevIcon), centre(shareIcon), centre(ourIcon));
+    const xButtons = [...group.querySelectorAll("button")].filter((b) => !b.closest(".x2d-btn"));
+    const rects = [xButtons.at(-2), xButtons.at(-1), wrapper].map((el) => el?.querySelector("svg")?.getBoundingClientRect());
+    if (!wrapper.isConnected || rects.some((rect) => !rect || rect.width === 0)) {
+      if (wrapper.isConnected) alignToShare(group, wrapper, tries - 1);
+      return;
+    }
+    const [prevX, shareX, ourX] = rects.map((rect) => rect.left + rect.width / 2);
+    const shift = iconShift(prevX, shareX, ourX);
     if (Math.abs(shift) <= 1) return;
-    const margin = parseFloat(wrapper.style.marginLeft) || 0;
-    wrapper.style.marginLeft = `${Math.max(0, margin + shift)}px`;
-    alignToShare(wrapper, prevIcon, shareIcon, ourIcon, tries - 1);
+    wrapper.style.marginLeft = `${nextMargin(parseFloat(wrapper.style.marginLeft) || 0, shift)}px`;
+    alignToShare(group, wrapper, tries - 1);
   });
 }
 
@@ -128,7 +131,7 @@ function injectButton(article) {
   wrapper.querySelector("svg").replaceWith(svg);
 
   slot.after(wrapper);
-  alignToShare(wrapper, buttons[buttons.length - 2]?.querySelector("svg"), original, svg);
+  alignToShare(group, wrapper);
   wireButton(wrapper.matches("button") ? wrapper : wrapper.querySelector("button"), article);
 }
 

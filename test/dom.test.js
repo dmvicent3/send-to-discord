@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { findPermalink, findActionBar, findSlot, iconShift } = require("../src/dom.js");
+const { findPermalink, findActionBar, findSlot, iconShift, nextMargin } = require("../src/dom.js");
 
 // Minimal element stand-in exposing the DOM properties dom.js relies on.
 function h(tag, attrs = {}, ...children) {
@@ -86,4 +86,11 @@ test("iconShift is the extra offset that matches the previous icon spacing", () 
 
 test("iconShift is 0 when nothing is laid out", () => {
   assert.equal(iconShift(0, 0, 0), 0);
+});
+
+test("nextMargin adds the shift and stays within 0..max", () => {
+  assert.equal(nextMargin(0, 10), 10);
+  assert.equal(nextMargin(10, -4), 6);
+  assert.equal(nextMargin(5, -20), 0);
+  assert.equal(nextMargin(0, 370), 48);
 });

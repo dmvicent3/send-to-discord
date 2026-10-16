@@ -42,4 +42,9 @@ function iconShift(prevX, shareX, ourX) {
   return Math.round(shareX - prevX - (ourX - shareX));
 }
 
-if (typeof module !== "undefined") module.exports = { findPermalink, findActionBar, findSlot, iconShift };
+// Applies a measured shift to the current margin, bounded so one bad measurement cannot shove the bar around.
+function nextMargin(margin, shift, max = 48) {
+  return Math.min(max, Math.max(0, margin + shift));
+}
+
+if (typeof module !== "undefined") module.exports = { findPermalink, findActionBar, findSlot, iconShift, nextMargin };
