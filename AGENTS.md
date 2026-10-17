@@ -1,6 +1,6 @@
 # Send to Discord
 
-Personal Firefox (MV3) extension: a button on each X post and old-layout Reddit post that sends it to one Discord webhook (X as an `fxtwitter.com` link; Reddit as uploaded images or an `vxreddit.com`/external link). Plain JavaScript, no bundler.
+Personal Firefox (MV3) extension: a button on each X post, old-layout Reddit post and YouTube video that sends it to one Discord webhook (X as an `fxtwitter.com` link; Reddit as uploaded images/videos or a `vxreddit.com`/external link; YouTube as the bare watch link). Plain JavaScript, no bundler.
 
 ## Done means green
 
@@ -17,6 +17,7 @@ Personal Firefox (MV3) extension: a button on each X post and old-layout Reddit 
 
 - X MVP: `docs/superpowers/specs/2026-10-16-x-to-discord-design.md`, `docs/superpowers/plans/2026-10-16-x-to-discord.md`
 - Reddit support and rename: `docs/superpowers/specs/2026-10-16-reddit-support-design.md`, `docs/superpowers/plans/2026-10-16-reddit-support.md`
+- YouTube support: `docs/superpowers/specs/2026-10-17-youtube-support-design.md`, `docs/superpowers/plans/2026-10-17-youtube-support.md`
 
 ## Task board
 

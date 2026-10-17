@@ -1,6 +1,6 @@
 # Send to Discord
 
-Firefox extension that adds a Discord button to posts on X and on old-layout Reddit. Click it once to arm it, click again to send the post to one Discord channel through a webhook.
+Firefox extension that adds a Discord button to posts on X, old-layout Reddit and YouTube. Click it once to arm it, click again to send the post to one Discord channel through a webhook.
 
 ## Install
 
@@ -39,6 +39,10 @@ Needs the old layout: `old.reddit.com`, or `www.reddit.com` with RES (Reddit Enh
 If an image or video is too large for Discord or fails to download, the `vxreddit.com` link is sent instead.
 
 If no webhook is set, the button opens the options page.
+
+### YouTube
+
+On a video's watch page a **Discord** button sits right after **Share**: `Discord` → `Send?` (click again within 3 s) → `Sending…` → `Sent ✓` or `Failed` (hover for the reason). It sends the bare link `https://www.youtube.com/watch?v=<id>` (no timestamp, playlist or tracking parameters) and Discord shows its own player.
 
 ## Develop
 
