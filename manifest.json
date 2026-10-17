@@ -38,7 +38,7 @@
     },
     {
       "matches": ["*://www.youtube.com/*"],
-      "js": ["src/core/button-state.js", "src/core/arm.js", "src/sites/youtube-url.js", "src/sites/youtube.js"],
+      "js": ["src/core/button-state.js", "src/core/arm.js", "src/sites/youtube-url.js", "src/sites/youtube-dom.js", "src/sites/youtube.js"],
       "run_at": "document_idle"
     }
   ]

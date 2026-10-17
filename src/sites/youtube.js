@@ -53,14 +53,16 @@ function buildButton(shareButton) {
   return { button, text };
 }
 
-function injectButton(row) {
-  if (row.querySelector(".s2d-yt")) return;
-  // Share is found by position, not by its label, so any UI language works.
-  const share = row.lastElementChild;
-  const shareButton = share?.querySelector("button");
-  if (!shareButton) return;
+// Keeps exactly one button right after Share, even when YouTube re-renders the row around it.
+function placeButton(row) {
+  const { anchor: share, action, existing, extras } = placement(row);
+  for (const extra of extras) extra.remove();
+  if (action === "move") share.after(existing);
+  if (action === "inject") injectButton(share);
+}
 
-  const { button, text } = buildButton(shareButton);
+function injectButton(share) {
+  const { button, text } = buildButton(share.querySelector("button"));
   const wrapper = document.createElement("div");
   wrapper.className = "s2d-yt";
   wrapper.appendChild(button);
@@ -83,7 +85,7 @@ function injectButton(row) {
 let queued = false;
 function scan() {
   queued = false;
-  for (const row of document.querySelectorAll("ytd-watch-metadata #top-level-buttons-computed")) injectButton(row);
+  for (const row of document.querySelectorAll("ytd-watch-metadata #top-level-buttons-computed")) placeButton(row);
 }
 
 const style = document.createElement("style");
