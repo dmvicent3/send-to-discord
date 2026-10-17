@@ -1,0 +1,64 @@
+[
+  {
+    "kind": "Listing",
+    "data": {
+      "children": [
+        {
+          "kind": "t3",
+          "data": {
+            "id": "3",
+            "subreddit": "pics",
+            "permalink": "/r/pics/comments/3/t/",
+            "is_self": false,
+            "is_video": false,
+            "domain": "reddit.com",
+            "url": "https://www.reddit.com/gallery/3",
+            "is_gallery": true,
+            "gallery_data": {
+              "items": [
+                {
+                  "media_id": "m1",
+                  "id": 1
+                },
+                {
+                  "media_id": "m2",
+                  "id": 2
+                },
+                {
+                  "media_id": "m3",
+                  "id": 3
+                }
+              ]
+            },
+            "media_metadata": {
+              "m1": {
+                "status": "valid",
+                "e": "Image",
+                "m": "image/jpg",
+                "s": {
+                  "u": "https://preview.redd.it/m1.jpg?width=640",
+                  "x": 640,
+                  "y": 480
+                }
+              },
+              "m2": {
+                "status": "failed"
+              },
+              "m3": {
+                "status": "valid",
+                "e": "AnimatedImage",
+                "m": "image/gif",
+                "s": {
+                  "gif": "https://i.redd.it/m3.gif",
+                  "mp4": "https://preview.redd.it/m3.gif?format=mp4",
+                  "x": 320,
+                  "y": 240
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

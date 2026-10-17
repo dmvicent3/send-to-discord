@@ -1,0 +1,35 @@
+[
+  {
+    "kind": "Listing",
+    "data": {
+      "children": [
+        {
+          "kind": "t3",
+          "data": {
+            "id": "4",
+            "subreddit": "pics",
+            "permalink": "/r/pics/comments/4/t/",
+            "is_self": false,
+            "is_video": false,
+            "domain": "reddit.com",
+            "url": "https://www.reddit.com/gallery/4",
+            "is_gallery": true,
+            "gallery_data": {
+              "items": [
+                {
+                  "media_id": "z1",
+                  "id": 1
+                }
+              ]
+            },
+            "media_metadata": {
+              "z1": {
+                "status": "failed"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

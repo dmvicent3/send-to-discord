@@ -1,0 +1,34 @@
+[
+  {
+    "kind": "Listing",
+    "data": {
+      "children": [
+        {
+          "kind": "t3",
+          "data": {
+            "id": "8",
+            "subreddit": "funny",
+            "permalink": "/r/funny/comments/8/t/",
+            "is_self": false,
+            "is_video": false,
+            "domain": "i.redd.it",
+            "url": "/r/pics/comments/1/t/",
+            "crosspost_parent": "t3_1",
+            "crosspost_parent_list": [
+              {
+                "id": "1",
+                "subreddit": "pics",
+                "permalink": "/r/pics/comments/1/t/",
+                "is_self": false,
+                "is_video": false,
+                "domain": "i.redd.it",
+                "post_hint": "image",
+                "url": "https://i.redd.it/abc.jpg"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+]
