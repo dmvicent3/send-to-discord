@@ -5,7 +5,20 @@ async function storedWebhook() {
   return webhookUrl || null;
 }
 
-browser.runtime.onMessage.addListener(async (message) => {
+// Uploads go over XMLHttpRequest so their progress can be reported; everything else uses fetch.
+function fetchWithUploadProgress(url, init) {
+  return init?.onUploadProgress ? xhrFetch(url, init) : fetch(url, init);
+}
+
+// Sends progress labels back to the frame whose button started the send.
+function progressTo(sender, id) {
+  return (label) => {
+    if (!id || !sender.tab) return;
+    browser.tabs.sendMessage(sender.tab.id, { type: "progress", id, label }, { frameId: sender.frameId }).catch(() => {});
+  };
+}
+
+browser.runtime.onMessage.addListener(async (message, sender) => {
   switch (message?.type) {
     case "send": {
       const webhook = await storedWebhook();
@@ -15,12 +28,12 @@ browser.runtime.onMessage.addListener(async (message) => {
     case "send-files": {
       const webhook = await storedWebhook();
       if (!webhook) return { ok: false, reason: "no webhook" };
-      return sendFiles(webhook, message.urls, message.fallback);
+      return sendFiles(webhook, message.urls, message.fallback, fetchWithUploadProgress, progressTo(sender, message.id));
     }
     case "send-video": {
       const webhook = await storedWebhook();
       if (!webhook) return { ok: false, reason: "no webhook" };
-      return sendVideo(webhook, message.page);
+      return sendVideo(webhook, message.page, fetchWithUploadProgress, progressTo(sender, message.id));
     }
     case "open-options":
       await browser.runtime.openOptionsPage();

@@ -40,9 +40,11 @@ function injectButton(thing) {
   item.appendChild(link);
   row.appendChild(item);
   wireButton(link, {
-    render: (state, reason = "") => {
+    render: (state, detail = "") => {
       item.dataset.state = state;
-      link.textContent = LABELS[state] + (state === STATES.failed ? reason : "");
+      if (state === STATES.failed) link.textContent = LABELS.failed + detail;
+      else if (state === STATES.sending && detail) link.textContent = detail;
+      else link.textContent = LABELS[state];
     },
     resolve: () => resolvePost(postPermalink(thing)),
   });

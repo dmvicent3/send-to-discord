@@ -25,7 +25,7 @@ The post's link is sent rewritten to `fxtwitter.com`, so Discord shows a full em
 
 ### Reddit
 
-Needs the old layout: `old.reddit.com`, or `www.reddit.com` with RES (Reddit Enhancement Suite) showing the classic look. A `discord` link appears at the end of each post's link row: `discord` → `send?` (click again within 3 s) → `sending…` → `sent ✓` or `failed: <reason>`.
+Needs the old layout: `old.reddit.com`, or `www.reddit.com` with RES (Reddit Enhancement Suite) showing the classic look. A `discord` link appears at the end of each post's link row: `discord` → `send?` (click again within 3 s) → `sending…` (for images and videos: `preparing…` → `downloading 42%` → `uploading 80%`) → `sent ✓` or `failed: <reason>`.
 
 | Post | What Discord gets |
 |---|---|

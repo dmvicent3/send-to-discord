@@ -42,7 +42,7 @@ Shared code moves under `src/core/`, each site gets one adapter under `src/sites
 - Posts are `div.thing.link` (comments are `.thing.comment` and are ignored). Each post's own action row is `.flat-list.buttons` inside the post's own `.entry`, not a nested comment's.
 - Append `<li class="s2d-reddit"><a role="button">discord</a></li>` (no `href`: a `#` link scrolls the page to the top) as the row's last item. It inherits the row's link styling, so RES themes (night mode) apply.
 - Idempotent: skip a row that already contains `.s2d-reddit`. A `MutationObserver` with one scan per animation frame covers RES never-ending scroll and expandos.
-- Labels per state: `discord` · `send?` · `sending…` · `sent ✓` · `failed: <reason>`; same timings as X (armed 3 s, result 2 s).
+- Labels per state: `discord` · `send?` · `sending…` · `sent ✓` · `failed: <reason>`; same timings as X (armed 3 s, result 2 s). While uploading files, `sending…` is replaced by progress from the background: `preparing…` → `downloading N%` → `uploading N%` (download read in chunks against `Content-Length`; upload over `XMLHttpRequest` for `upload.onprogress`; labels sent to the tab with `tabs.sendMessage` keyed by a per-send id; only changes are sent, never backwards within a phase).
 
 ## Resolving what to send
 

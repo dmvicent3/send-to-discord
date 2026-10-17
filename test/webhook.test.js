@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { normalizeWebhookUrl, sendToWebhook, fileNameFromUrl, sendFilesToWebhook, sendFiles, ogVideoUrl, sendVideo } = require("../src/core/webhook.js");
+const { normalizeWebhookUrl, sendToWebhook, fileNameFromUrl, sendFilesToWebhook, sendFiles, ogVideoUrl, sendVideo, progressReporter } = require("../src/core/webhook.js");
 
 const HOOK = "https://discord.com/api/webhooks/1/abc";
 const LINK = "https://fxtwitter.com/jack/status/20";
@@ -280,4 +280,63 @@ test("sendVideo sends the page link when Discord refuses the video as too large"
   });
   assert.deepEqual(await sendVideo(HOOK, PAGE, fetch.fn), { ok: true });
   assert.equal(JSON.parse(fetch.posts.at(-1).body).content, PAGE);
+});
+
+test("progressReporter labels phases, drops repeats and never goes backwards", () => {
+  const labels = [];
+  const report = progressReporter((label) => labels.push(label));
+  report("preparing");
+  report("preparing");
+  report("downloading", 0.421);
+  report("downloading", 0.424);
+  report("downloading", 0.3);
+  report("downloading", 1.2);
+  report("uploading", 0);
+  report("uploading", 0.5);
+  assert.deepEqual(labels, ["preparing…", "downloading 42%", "downloading 100%", "uploading 0%", "uploading 50%"]);
+});
+
+// A download whose body arrives in `chunks` pieces of 25 bytes each.
+const chunkedImage = (chunks) => () => {
+  const piece = new Uint8Array(25);
+  let sent = 0;
+  return new Response(
+    new ReadableStream({
+      pull(controller) {
+        if (sent++ < chunks) controller.enqueue(piece);
+        else controller.close();
+      },
+    }),
+    { headers: { "Content-Length": String(25 * chunks), "Content-Type": "image/jpeg" } },
+  );
+};
+
+test("sendFiles reports download and upload progress", async () => {
+  const labels = [];
+  const fetch = routedFetch({
+    files: { [IMG]: chunkedImage(4) },
+    hook: (init) => {
+      init.onUploadProgress?.(50, 100);
+      init.onUploadProgress?.(100, 100);
+      return new Response(null, { status: 204 });
+    },
+  });
+  assert.deepEqual(await sendFiles(HOOK, [IMG], FALLBACK, fetch.fn, (label) => labels.push(label)), { ok: true });
+  assert.deepEqual(labels, ["preparing…", "downloading 25%", "downloading 50%", "downloading 75%", "downloading 100%", "uploading 50%", "uploading 100%"]);
+  assert.equal(fetch.posts[0].body.get("files[0]").size, 100);
+});
+
+test("sendFiles spreads download progress across several files", async () => {
+  const labels = [];
+  const SECOND = "https://i.redd.it/def.jpg";
+  const fetch = routedFetch({ files: { [IMG]: chunkedImage(2), [SECOND]: chunkedImage(2) } });
+  await sendFiles(HOOK, [IMG, SECOND], FALLBACK, fetch.fn, (label) => labels.push(label));
+  assert.deepEqual(labels.filter((l) => l.startsWith("downloading")), ["downloading 25%", "downloading 50%", "downloading 75%", "downloading 100%"]);
+});
+
+test("sendVideo reports preparing while the embed page and video are fetched", async () => {
+  const labels = [];
+  const fetch = routedFetch({ files: { [PAGE]: pageWith(VIDEO_META), [MP4]: image } });
+  await sendVideo(HOOK, PAGE, fetch.fn, (label) => labels.push(label));
+  assert.equal(labels[0], "preparing…");
 });
