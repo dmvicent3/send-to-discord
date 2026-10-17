@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { findPermalink, findActionBar, findSlot, iconShift, nextMargin } = require("../src/dom.js");
+const { findPermalink, findActionBar, findSlot, iconShift, nextMargin } = require("../src/sites/x-dom.js");
 
 // Minimal element stand-in exposing the DOM properties dom.js relies on.
 function h(tag, attrs = {}, ...children) {

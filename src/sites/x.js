@@ -27,14 +27,6 @@ const STYLE = `
 .x2d-btn[data-state="failed"] svg { color: #F4212E !important; }
 `;
 
-let hasWebhook = false;
-browser.storage.local.get("webhookUrl").then(({ webhookUrl }) => {
-  hasWebhook = Boolean(webhookUrl);
-});
-browser.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && "webhookUrl" in changes) hasWebhook = Boolean(changes.webhookUrl.newValue);
-});
-
 function render(btn, state, reason = "") {
   const wrapper = btn.closest(".x2d-btn");
   wrapper.dataset.state = state;
@@ -42,47 +34,6 @@ function render(btn, state, reason = "") {
   const tooltip = TOOLTIP[state] + (state === STATES.failed ? reason : "");
   btn.title = tooltip;
   btn.setAttribute("aria-label", tooltip);
-}
-
-function wireButton(btn, article) {
-  let state = STATES.idle;
-  let timer = null;
-
-  const go = (event, reason) => {
-    state = transition(state, event);
-    render(btn, state, reason);
-    clearTimeout(timer);
-    if (state === STATES.armed) timer = setTimeout(() => go("timeout"), ARM_MS);
-    if (state === STATES.sent || state === STATES.failed) timer = setTimeout(() => go("timeout"), RESULT_MS);
-  };
-
-  const send = async () => {
-    const url = toFxUrl(findPermalink(article) ?? "");
-    if (!url) return go("failed", "no post link");
-    let result;
-    try {
-      result = await browser.runtime.sendMessage({ type: "send", url });
-    } catch (error) {
-      console.warn("x-to-discord: send message failed", error);
-      result = { ok: false, reason: "extension error" };
-    }
-    if (result?.ok) go("sent");
-    else go("failed", result?.reason ?? "no response");
-  };
-
-  btn.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (state === STATES.idle && !hasWebhook) {
-      browser.runtime.sendMessage({ type: "open-options" });
-      return;
-    }
-    const before = state;
-    go("click");
-    if (before === STATES.armed && state === STATES.sending) send();
-  });
-
-  render(btn, state);
 }
 
 // Share carries no trailing spacing (it was last), so set our margin until share→ours matches prev→share.
@@ -132,7 +83,14 @@ function injectButton(article) {
 
   slot.after(wrapper);
   alignToShare(group, wrapper);
-  wireButton(wrapper.matches("button") ? wrapper : wrapper.querySelector("button"), article);
+  const btn = wrapper.matches("button") ? wrapper : wrapper.querySelector("button");
+  wireButton(btn, {
+    render: (state, reason) => render(btn, state, reason),
+    resolve: async () => {
+      const url = toFxUrl(findPermalink(article) ?? "");
+      return url ? { type: "send", url } : null;
+    },
+  });
 }
 
 let queued = false;

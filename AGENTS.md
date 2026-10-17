@@ -8,9 +8,10 @@ Personal Firefox (MV3) extension: a button on each X post that sends its link, r
 
 ## Shape
 
-- Decisions sit in pure files with tests (`src/fxurl.js`); `content.js`, `background.js` and `options.js` are thin adapters around them. Put new logic in a pure file with a test, then wire it.
+- `src/core/` holds what every site shares (click-to-arm in `arm.js`, state machine, webhook); `src/sites/` holds one adapter per site plus its pure helpers, and each site is its own `content_scripts` entry. A new site is a new adapter that calls `wireButton(el, { render, resolve })`.
+- Decisions sit in pure files with tests (`src/sites/fxurl.js`); site adapters, `background.js` and `options.js` are thin wiring around them. Put new logic in a pure file with a test, then wire it.
 - The webhook `fetch` belongs in `background.js`: X's CSP blocks it from the content script.
-- The injected button is cloned from X's own share button so it inherits X's styling; selectors for X's DOM (`article[data-testid="tweet"]`, `[role="group"]`) are the fragile part when X ships changes.
+- The X button is cloned from X's own share button so it inherits X's styling; selectors for X's DOM (`article[data-testid="tweet"]`, `[role="group"]`) are the fragile part when X ships changes.
 
 ## Design docs
 

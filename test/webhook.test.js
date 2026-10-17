@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { normalizeWebhookUrl, sendToWebhook } = require("../src/webhook.js");
+const { normalizeWebhookUrl, sendToWebhook } = require("../src/core/webhook.js");
 
 const HOOK = "https://discord.com/api/webhooks/1/abc";
 const LINK = "https://fxtwitter.com/jack/status/20";

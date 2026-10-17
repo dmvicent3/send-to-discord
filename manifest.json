@@ -18,12 +18,12 @@
     "https://ptb.discord.com/api/webhooks/*",
     "https://canary.discord.com/api/webhooks/*"
   ],
-  "background": { "scripts": ["src/webhook.js", "src/background.js"] },
+  "background": { "scripts": ["src/core/webhook.js", "src/background.js"] },
   "options_ui": { "page": "src/options.html", "open_in_tab": false },
   "content_scripts": [
     {
       "matches": ["*://x.com/*", "*://twitter.com/*", "*://mobile.twitter.com/*"],
-      "js": ["src/fxurl.js", "src/dom.js", "src/button-state.js", "src/content.js"],
+      "js": ["src/core/button-state.js", "src/core/arm.js", "src/sites/fxurl.js", "src/sites/x-dom.js", "src/sites/x.js"],
       "run_at": "document_idle"
     }
   ]

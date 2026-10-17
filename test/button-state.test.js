@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { STATES, ARM_MS, RESULT_MS, TOOLTIP, transition } = require("../src/button-state.js");
+const { STATES, ARM_MS, RESULT_MS, TOOLTIP, transition } = require("../src/core/button-state.js");
 
 const TABLE = [
   ["idle", "click", "armed"],

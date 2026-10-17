@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { toFxUrl } = require("../src/fxurl.js");
+const { toFxUrl } = require("../src/sites/fxurl.js");
 
 test("rewrites status links", () => {
   const cases = [
