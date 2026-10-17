@@ -86,6 +86,8 @@ async function sendBatch(webhookUrl, files, fetchImpl, skipped, onUpload) {
     return { ok: false, reason: "network" };
   }
   if (response.status === 413) {
+    const sizes = files.map(({ name, blob }) => `${name} ${(blob.size / 1048576).toFixed(2)} MiB`).join(", ");
+    console.warn("x-to-discord: Discord refused the upload as too large:", sizes, await response.text().catch(() => ""));
     if (files.length === 1) {
       skipped.push(files[0].name);
       return { ok: true };
@@ -178,14 +180,18 @@ function ogVideoUrl(html) {
 }
 
 // Uploads the video an embed page offers (its og:video); anything that keeps it from uploading sends the page link.
+const EMBED_USER_AGENT = "Mozilla/5.0 (compatible; SendToDiscordBot/0.2)";
+
 async function sendVideo(webhookUrl, page, fetchImpl = fetch, onProgress = () => {}) {
   let last = null;
   const emit = (label) => label !== last && onProgress((last = label));
   emit("preparing…");
   let videoUrl = null;
   try {
-    const response = await fetchImpl(page, { cache: "no-store" });
+    // vxreddit only serves its embed page to user agents containing "bot"; browsers are redirected to Reddit.
+    const response = await fetchImpl(page, { cache: "no-store", headers: { "User-Agent": EMBED_USER_AGENT } });
     if (response.ok) videoUrl = ogVideoUrl(await response.text());
+    if (!videoUrl) console.warn("x-to-discord: no video on the embed page, sending the link", response.status, response.url || page);
   } catch (error) {
     console.warn("x-to-discord: embed page fetch failed", page, error);
   }

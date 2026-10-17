@@ -340,3 +340,10 @@ test("sendVideo reports preparing while the embed page and video are fetched", a
   await sendVideo(HOOK, PAGE, fetch.fn, (label) => labels.push(label));
   assert.equal(labels[0], "preparing…");
 });
+
+test("sendVideo asks for the embed page as a bot, since vxreddit redirects browsers to Reddit", async () => {
+  const fetch = routedFetch({ files: { [PAGE]: pageWith(VIDEO_META), [MP4]: image } });
+  await sendVideo(HOOK, PAGE, fetch.fn);
+  const userAgent = new Headers(fetch.downloadInits[0]?.headers).get("User-Agent") ?? "";
+  assert.match(userAgent, /bot/i);
+});
