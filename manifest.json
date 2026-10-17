@@ -28,7 +28,7 @@
   "content_scripts": [
     {
       "matches": ["*://x.com/*", "*://twitter.com/*", "*://mobile.twitter.com/*"],
-      "js": ["src/core/button-state.js", "src/core/arm.js", "src/sites/fxurl.js", "src/sites/x-dom.js", "src/sites/x.js"],
+      "js": ["src/core/button-state.js", "src/core/arm.js", "src/core/icons.js", "src/sites/fxurl.js", "src/sites/x-dom.js", "src/sites/x.js"],
       "run_at": "document_idle"
     },
     {
@@ -38,7 +38,7 @@
     },
     {
       "matches": ["*://www.youtube.com/*"],
-      "js": ["src/core/button-state.js", "src/core/arm.js", "src/sites/youtube-url.js", "src/sites/youtube-dom.js", "src/sites/youtube.js"],
+      "js": ["src/core/button-state.js", "src/core/arm.js", "src/core/icons.js", "src/sites/youtube-url.js", "src/sites/youtube-dom.js", "src/sites/youtube.js"],
       "run_at": "document_idle"
     }
   ]

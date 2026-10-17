@@ -42,7 +42,7 @@ If no webhook is set, the button opens the options page.
 
 ### YouTube
 
-On a video's watch page a **Discord** button sits right after **Share**: `Discord` → `Send?` (click again within 3 s) → `Sending…` → `Sent ✓` or `Failed` (hover for the reason). It sends the bare link `https://www.youtube.com/watch?v=<id>` (no timestamp, playlist or tracking parameters) and Discord shows its own player.
+On a video's watch page a round Discord icon sits just before the **…** button. It works like the X button (blurple arrow when armed, green check when sent, red cross on failure, hover for details) and sends the bare link `https://www.youtube.com/watch?v=<id>` (no timestamp, playlist or tracking parameters); Discord shows its own player.
 
 ## Develop
 

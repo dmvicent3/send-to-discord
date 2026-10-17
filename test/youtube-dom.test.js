@@ -3,40 +3,33 @@ const assert = require("node:assert/strict");
 const { h } = require("./helpers/fake-dom.js");
 const { placement } = require("../src/sites/youtube-dom.js");
 
-const like = () => h("segmented-like-dislike-button-view-model", {}, h("button", { class: "yt-spec-button-shape-next--segmented-start" }));
-const share = () => h("yt-button-view-model", {}, h("button-view-model", {}, h("button", { class: "yt-spec-button-shape-next--tonal" })));
+// The watch page's ytd-menu-renderer: top-level buttons (like, share), flexible items (save), then "...".
+const topLevel = () => h("div", { id: "top-level-buttons-computed" }, h("segmented-like-dislike-button-view-model", {}, h("button", {})), h("yt-button-view-model", {}, h("button", {})));
+const flexible = () => h("div", { id: "flexible-item-buttons" }, h("yt-button-view-model", {}, h("button", {})));
+const more = () => h("yt-button-shape", { id: "button-shape" }, h("button", { class: "yt-spec-button-shape-next--icon-button" }));
 const ours = () => h("div", { class: "s2d-yt" }, h("button", {}));
 
-test("anchors on Share, after the like control", () => {
-  const s = share();
-  const row = h("div", {}, like(), s);
-  assert.deepEqual(placement(row), { anchor: s, action: "inject", existing: null, extras: [] });
+test("anchors on the more-actions button, after Save", () => {
+  const m = more();
+  assert.deepEqual(placement(h("ytd-menu-renderer", {}, topLevel(), flexible(), m)), { anchor: m, action: "inject", existing: null, extras: [] });
 });
 
-test("waits while only the like control has a button", () => {
-  assert.equal(placement(h("div", {}, like(), h("yt-button-view-model"))).anchor, null);
-  assert.equal(placement(h("div", {}, like())).anchor, null);
+test("waits until the more-actions button has rendered", () => {
+  assert.equal(placement(h("ytd-menu-renderer", {}, topLevel(), flexible(), h("yt-button-shape", { id: "button-shape" }))).anchor, null);
+  assert.equal(placement(h("ytd-menu-renderer", {}, topLevel(), flexible())).anchor, null);
 });
 
-test("never anchors on a segmented button even under another tag", () => {
-  const row = h("div", {}, h("like-button-view-model", {}, h("button", {})), h("x", {}, h("button", { class: "a yt-spec-button-shape-next--segmented-end" })));
-  assert.equal(placement(row).anchor, null);
+test("leaves our button alone when it sits right before the more-actions button", () => {
+  const [m, o] = [more(), ours()];
+  assert.deepEqual(placement(h("ytd-menu-renderer", {}, topLevel(), flexible(), o, m)), { anchor: m, action: "ok", existing: o, extras: [] });
 });
 
-test("leaves our button alone when it already follows Share", () => {
-  const s = share();
-  const o = ours();
-  assert.deepEqual(placement(h("div", {}, like(), s, o)), { anchor: s, action: "ok", existing: o, extras: [] });
-});
-
-test("moves our button when YouTube re-adds Share after it", () => {
-  const s = share();
-  const o = ours();
-  assert.deepEqual(placement(h("div", {}, like(), o, s)), { anchor: s, action: "move", existing: o, extras: [] });
+test("moves our button when YouTube re-renders the row around it", () => {
+  const [m, o] = [more(), ours()];
+  assert.deepEqual(placement(h("ytd-menu-renderer", {}, o, topLevel(), flexible(), m)), { anchor: m, action: "move", existing: o, extras: [] });
 });
 
 test("keeps one button and reports the extras", () => {
-  const s = share();
-  const [a, b] = [ours(), ours()];
-  assert.deepEqual(placement(h("div", {}, like(), s, a, b)), { anchor: s, action: "ok", existing: a, extras: [b] });
+  const [m, a, b] = [more(), ours(), ours()];
+  assert.deepEqual(placement(h("ytd-menu-renderer", {}, topLevel(), flexible(), a, b, m)), { anchor: m, action: "move", existing: a, extras: [b] });
 });

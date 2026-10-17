@@ -15,8 +15,8 @@ Success: on `www.youtube.com/watch`, two clicks on the Discord button put `https
 | What is sent | The link only, `https://www.youtube.com/watch?v=<id>`; Discord shows its own player |
 | Timestamp | Never: the link always starts at 0 |
 | Other parameters | Dropped (`t`, `si`, `pp`, `list`, `index`, and anything else) |
-| Where | Watch page only, directly after YouTube's Share button. Not Shorts, not thumbnail grids |
-| Look | Cloned from YouTube's Share button (inherits light/dark styling), Discord glyph, text label |
+| Where | Watch page only, directly before the "…" button (after Save). Not Shorts, not thumbnail grids |
+| Look | Icon only, cloned from YouTube's round "…" button (inherits light/dark styling); icon and tooltip change per state as on X |
 | Destination | Same single webhook |
 
 ## Link
@@ -30,11 +30,13 @@ Success: on `www.youtube.com/watch`, two clicks on the Discord button put `https
 
 ## Button
 
-- Anchor: YouTube's Share button in the watch page's action row (inside `ytd-watch-metadata`). The adapter clones the Share wrapper's plain `<button>` (it carries YouTube's `yt-spec-button-shape-next` styling classes) into a plain `<div class="s2d-yt">`. The wrapper itself is a YouTube custom element and is not cloned: cloning it would re-run YouTube's rendering and overwrite the icon and label. The clone has `id`, `aria-*` and test attributes stripped.
-- The clone's icon is replaced with the Discord glyph (same path data as X, `fill="currentColor"`), and its text becomes the state label.
-- Inserted directly after the Share wrapper. When YouTube shows Download, Clip or Save after Share, the Discord button sits before them.
-- Reconciled, not just skipped (`placement(row)` in `src/sites/youtube-dom.js`, pure, tested): Share is the last child with a rendered `<button>` that is neither ours nor part of the like/dislike control (no `--segmented-` button); nothing is injected until it exists. Our button is moved back after Share if YouTube re-adds Share after it, and duplicates are removed. A `MutationObserver` with one scan per animation frame re-adds it after YouTube re-renders the row (navigation between videos, layout changes).
-- Labels per state: `Discord` · `Send?` · `Sending…` · `Sent ✓` · `Failed`; the failure reason goes in the button's `title`. Colours via a small injected stylesheet keyed on `data-state`: armed and sending `#5865F2` (sending at half opacity), sent `#00BA7C`, failed `#F4212E`. Timings as X: armed 3 s, result 2 s.
+Revised 2026-10-17 after the first live check (user's request): icon only, placed just before "…".
+
+- Anchor: the watch page's action menu (`ytd-menu-renderer`, the parent of `ytd-watch-metadata #top-level-buttons-computed`). It holds the like/Share group, the flexible items (Save/"Guardar", Clip…) and then the round "…" button. Our button goes directly before "…", so after Save.
+- The adapter shallow-clones the "…" button's plain `<button>` (round, icon-only, YouTube's `yt-spec-button-shape-next` classes) into a plain `<div class="s2d-yt">`, strips `id`, `aria-*` and `data-*`, and fills it with only a Discord `svg`: no text, nothing of YouTube's icon or ripple. YouTube's custom-element wrappers are never cloned (cloning them re-runs YouTube's rendering).
+- Icons and tooltips as on X: the icon per state comes from `ICON_FOR_STATE` (Discord · send arrow · send arrow · check · cross) and the `title`/`aria-label` from `TOOLTIP` (`Send to Discord` · `Click again to send` · `Sending…` · `Sent` · `Failed: <reason>`). `ICONS` and `ICON_FOR_STATE` move from `src/sites/x.js` to `src/core/icons.js`, shared by X and YouTube.
+- Colours via a small injected stylesheet keyed on `data-state`: armed and sending `#5865F2` (sending at half opacity), sent `#00BA7C`, failed `#F4212E`. Timings as X: armed 3 s, result 2 s.
+- Placement is reconciled on every scan (`placement(menu)` in `src/sites/youtube-dom.js`, pure, tested): "…" is the menu's last child with a rendered `<button>` that is neither ours nor one of the two button groups; nothing is injected until it exists; our button is moved back before "…" when YouTube re-renders the menu, and duplicates are removed. A `MutationObserver` with one scan per animation frame drives it.
 
 ## Resolving what to send
 
@@ -57,7 +59,7 @@ Third `content_scripts` entry: `matches: ["*://www.youtube.com/*"]`, `js: ["src/
   - another host → `null`.
 - `npm test` and `npm run lint` green; X and Reddit tests unchanged.
 - Manual on `www.youtube.com`:
-  1. Button right after Share, matching its style, in light and dark theme.
+  1. Icon-only button just before "…", matching its style, in light and dark theme.
   2. Two clicks send `https://www.youtube.com/watch?v=<id>` and Discord shows the player.
   3. Open a video with `&t=` / from a playlist: the sent link has neither.
   4. Click another video from the sidebar, then send: the new video's link, one button only.
