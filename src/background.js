@@ -1,4 +1,4 @@
-// Handles messages from the content script; the webhook POST runs here because X's CSP blocks it in the page.
+// Handles messages from the content scripts; webhook POSTs and media downloads run here because page CSPs block them.
 
 async function storedWebhook() {
   const { webhookUrl } = await browser.storage.local.get("webhookUrl");
@@ -11,6 +11,11 @@ browser.runtime.onMessage.addListener(async (message) => {
       const webhook = await storedWebhook();
       if (!webhook) return { ok: false, reason: "no webhook" };
       return sendToWebhook(webhook, message.url);
+    }
+    case "send-files": {
+      const webhook = await storedWebhook();
+      if (!webhook) return { ok: false, reason: "no webhook" };
+      return sendFiles(webhook, message.urls, message.fallback);
     }
     case "open-options":
       await browser.runtime.openOptionsPage();
