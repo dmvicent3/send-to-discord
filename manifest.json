@@ -27,6 +27,11 @@
       "matches": ["*://x.com/*", "*://twitter.com/*", "*://mobile.twitter.com/*"],
       "js": ["src/core/button-state.js", "src/core/arm.js", "src/sites/fxurl.js", "src/sites/x-dom.js", "src/sites/x.js"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://www.reddit.com/*", "*://old.reddit.com/*"],
+      "js": ["src/core/button-state.js", "src/core/arm.js", "src/sites/reddit-share.js", "src/sites/reddit-dom.js", "src/sites/reddit.js"],
+      "run_at": "document_idle"
     }
   ]
 }
