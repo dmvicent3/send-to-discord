@@ -67,7 +67,8 @@ New message `{ type: "send-files", urls, fallback }`. Background:
 
 1. Downloads each URL. A `Content-Length` over 100 MiB or a failed download → send `fallback` as a link and report the result of that.
 2. `sendFilesToWebhook(webhookUrl, files, fetchImpl)` where `files = [{ name, blob }]`: posts batches of 10 as `multipart/form-data` with `payload_json` = `{}` and `files[0..9]`. File name = last path segment of the URL.
-3. HTTP 413 on any batch → send `fallback` as a link. Other non-2xx → `{ ok: false, reason: "HTTP <status>" }`; network error → `reason: "network"`.
+3. HTTP 413 on a batch → split it in half and retry each half, in order; a single file that still gets 413 is skipped. If any file was skipped, send `fallback` as a link after the images that did post (only the link when none did). Other non-2xx → `{ ok: false, reason: "HTTP <status>" }`; network error → `reason: "network"`.
+4. Every JSON message sets `allowed_mentions: { parse: [] }`, so a link containing `@everyone` pings no one.
 
 `host_permissions` gain `https://i.redd.it/*` and `https://preview.redd.it/*` (downloads come from the background, where CORS does not apply with host permission). `data_collection_permissions.required` gains `websiteContent`.
 

@@ -51,7 +51,7 @@ test("sendToWebhook posts the link as JSON content", async () => {
   assert.equal(url, HOOK);
   assert.equal(init.method, "POST");
   assert.equal(init.headers["Content-Type"], "application/json");
-  assert.deepEqual(JSON.parse(init.body), { content: LINK });
+  assert.deepEqual(JSON.parse(init.body), { content: LINK, allowed_mentions: { parse: [] } });
 });
 
 test("sendToWebhook reports HTTP errors", async () => {
@@ -94,7 +94,7 @@ test("fileNameFromUrl takes the last path segment without the query", () => {
 
 test("sendFilesToWebhook posts one file as multipart with an empty payload", async () => {
   const fetch = routedFetch();
-  assert.deepEqual(await sendFilesToWebhook(HOOK, [blobFile("abc.jpg")], fetch.fn), { ok: true });
+  assert.deepEqual(await sendFilesToWebhook(HOOK, [blobFile("abc.jpg")], fetch.fn), { ok: true, skipped: [] });
   assert.equal(fetch.posts.length, 1);
   const body = fetch.posts[0].body;
   assert.ok(body instanceof FormData);
@@ -115,11 +115,40 @@ test("sendFilesToWebhook sends 23 files as batches of 10, 10 and 3 in order", as
   assert.equal(fetch.posts[1].body.get("files[0]").name, "f10.jpg");
 });
 
-test("sendFilesToWebhook stops at a 413 and flags it as too large", async () => {
-  const fetch = routedFetch({ hook: () => new Response("too big", { status: 413 }) });
-  const files = Array.from({ length: 12 }, (_, i) => blobFile(`f${i}.jpg`));
-  assert.deepEqual(await sendFilesToWebhook(HOOK, files, fetch.fn), { ok: false, reason: "HTTP 413", tooLarge: true });
-  assert.equal(fetch.posts.length, 1);
+test("sendFilesToWebhook halves a batch Discord rejects as too large and keeps the order", async () => {
+  const posted = [];
+  const fetch = routedFetch({
+    hook: (init) => {
+      const names = fileNames(init);
+      if (names.length > 4) return new Response(null, { status: 413 });
+      posted.push(...names);
+      return new Response(null, { status: 204 });
+    },
+  });
+  const files = Array.from({ length: 10 }, (_, i) => blobFile(`f${i}.jpg`));
+  assert.deepEqual(await sendFilesToWebhook(HOOK, files, fetch.fn), { ok: true, skipped: [] });
+  assert.deepEqual(posted, files.map((f) => f.name));
+});
+
+test("sendFilesToWebhook skips a single file that is too large on its own", async () => {
+  const posted = [];
+  const fetch = routedFetch({
+    hook: (init) => {
+      const names = fileNames(init);
+      if (names.includes("big.jpg")) return new Response(null, { status: 413 });
+      posted.push(...names);
+      return new Response(null, { status: 204 });
+    },
+  });
+  const files = [blobFile("a.jpg"), blobFile("big.jpg"), blobFile("c.jpg")];
+  assert.deepEqual(await sendFilesToWebhook(HOOK, files, fetch.fn), { ok: true, skipped: ["big.jpg"] });
+  assert.deepEqual(posted, ["a.jpg", "c.jpg"]);
+});
+
+test("sendToWebhook never pings anyone", async () => {
+  const fetch = routedFetch();
+  await sendToWebhook(HOOK, "https://example.com/@everyone", fetch.fn);
+  assert.deepEqual(JSON.parse(fetch.posts[0].body).allowed_mentions, { parse: [] });
 });
 
 test("sendFilesToWebhook reports other failures", async () => {
@@ -165,6 +194,18 @@ test("sendFiles skips files over 100 MiB without reading them", async () => {
   assert.equal(fetch.posts.length, 1);
   assert.ok(isFallback(fetch.posts[0]));
   assert.equal(read, false);
+});
+
+test("sendFiles posts the images that fit, then the fallback link for the rest", async () => {
+  const BIG = "https://i.redd.it/big.jpg";
+  const fetch = routedFetch({
+    files: { [IMG]: image, [BIG]: image },
+    hook: (init) => new Response(null, { status: init.body instanceof FormData && fileNames(init).includes("big.jpg") ? 413 : 204 }),
+  });
+  assert.deepEqual(await sendFiles(HOOK, [IMG, BIG], FALLBACK, fetch.fn), { ok: true });
+  const sent = fetch.posts.filter((init) => !(init.body instanceof FormData) || !fileNames(init).includes("big.jpg"));
+  assert.deepEqual(sent.map((init) => (init.body instanceof FormData ? fileNames(init) : "link")), [["abc.jpg"], "link"]);
+  assert.ok(isFallback(sent[1]));
 });
 
 test("sendFiles sends the fallback link when the upload is too large", async () => {
