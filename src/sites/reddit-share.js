@@ -1,10 +1,10 @@
 // Decides what a Reddit post becomes in Discord: uploaded image files, or a link that embeds.
 
-const EMBED_HOST = "rxddit.com";
+const EMBED_HOST = "vxreddit.com";
 
 const IMAGE_EXT = { "image/jpg": "jpg", "image/jpeg": "jpg", "image/png": "png", "image/gif": "gif", "image/webp": "webp" };
 
-function rxdditLink(permalink) {
+function embedLink(permalink) {
   return `https://${EMBED_HOST}${permalink}`;
 }
 
@@ -30,7 +30,7 @@ function galleryUrls(src) {
 
 function planRedditShare(post) {
   const src = post.crosspost_parent_list?.[0] ?? post;
-  const link = { type: "link", url: rxdditLink(src.permalink) };
+  const link = { type: "link", url: embedLink(src.permalink) };
   const files = (urls) => ({ type: "files", urls, fallback: link.url });
 
   if (src.is_gallery) {
@@ -44,4 +44,4 @@ function planRedditShare(post) {
   return link;
 }
 
-if (typeof module !== "undefined") module.exports = { EMBED_HOST, rxdditLink, planRedditShare };
+if (typeof module !== "undefined") module.exports = { EMBED_HOST, embedLink, planRedditShare };

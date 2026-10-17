@@ -22,8 +22,8 @@ async function resolvePost(permalink) {
       ? { type: "send-files", urls: plan.urls, fallback: plan.fallback }
       : { type: "send", url: plan.url };
   } catch (error) {
-    console.warn("x-to-discord: post lookup failed, sending the rxddit link", error);
-    return { type: "send", url: rxdditLink(permalink) };
+    console.warn("x-to-discord: post lookup failed, sending the embed link", error);
+    return { type: "send", url: embedLink(permalink) };
   }
 }
 

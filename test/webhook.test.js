@@ -66,7 +66,7 @@ test("sendToWebhook reports network failures", async () => {
   assert.deepEqual(await sendToWebhook(HOOK, LINK, fetch), { ok: false, reason: "network" });
 });
 
-const FALLBACK = "https://rxddit.com/r/pics/comments/1/t/";
+const FALLBACK = "https://vxreddit.com/r/pics/comments/1/t/";
 
 // Routes each request: webhook posts get `hook(init)`, downloads get `files[url]` (a Response or a function).
 function routedFetch({ hook = () => new Response(null, { status: 204 }), files = {} } = {}) {

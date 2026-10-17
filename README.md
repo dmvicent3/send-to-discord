@@ -31,12 +31,12 @@ Needs the old layout: `old.reddit.com`, or `www.reddit.com` with RES (Reddit Enh
 |---|---|
 | Image or GIF | the file, uploaded, no text |
 | Gallery | the images, 10 per message |
-| Reddit video | an `rxddit.com` link (plays with sound) |
+| Reddit video | an `vxreddit.com` link (plays with sound) |
 | External link | that link |
-| Text post | an `rxddit.com` link |
+| Text post | an `vxreddit.com` link |
 | Crosspost | the same, for the original post |
 
-If an image is too large for Discord or fails to download, the `rxddit.com` link is sent instead.
+If an image is too large for Discord or fails to download, the `vxreddit.com` link is sent instead.
 
 If no webhook is set, the button opens the options page.
 

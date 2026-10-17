@@ -1,6 +1,6 @@
 # Send to Discord: Reddit support and rename
 
-Date: 2026-10-16. Status: approved in chat, awaiting written-spec review. Builds on `2026-10-16-x-to-discord-design.md`.
+Date: 2026-10-16. Status: approved. 2026-10-17: embed host switched from rxddit.com (answers "Forbidden." to every request, including Discordbot) to vxreddit.com (player embed with audio). Builds on `2026-10-16-x-to-discord-design.md`.
 
 ## Goal
 
@@ -17,11 +17,11 @@ Success: on an RES old-layout listing or post page, two clicks on `discord` put 
 | Destination | Same single webhook as X |
 | Image/GIF post | Upload the file; message has no text |
 | Gallery | Upload images, 10 per message, more messages if needed; no text |
-| Reddit video | Link `https://rxddit.com<permalink>` |
+| Reddit video | Link `https://vxreddit.com<permalink>` |
 | External link post | The external URL as-is |
-| Text post / anything else | rxddit link |
+| Text post / anything else | vxreddit link |
 | Crosspost | Decide and build from the crosspost parent |
-| Upload size | No hard-coded Discord limit: try, and on HTTP 413 send the rxddit link instead. Skip download (go to link) for files over 100 MiB |
+| Upload size | No hard-coded Discord limit: try, and on HTTP 413 send the vxreddit link instead. Skip download (go to link) for files over 100 MiB |
 | Name | Display name `Send to Discord`; repo, folder and package `send-to-discord`; gecko id stays `x-to-discord@dmvicent3` so the signed install keeps updating |
 
 ## Structure
@@ -50,16 +50,16 @@ On the second click the adapter reads `data-permalink` from the post and fetches
 
 `planRedditShare(post) -> { type: "files", urls: string[], fallback: string } | { type: "link", url: string }`, in this order:
 
-1. `src.is_gallery`: for each `src.gallery_data.items` (in order) take `src.media_metadata[item.media_id]`, skipping entries whose `status !== "valid"`; URL is `s.gif` when present, otherwise `https://i.redd.it/<media_id>.<ext>` with `ext` from `m` (`image/jpg`→`jpg`, `image/png`→`png`, `image/gif`→`gif`, `image/webp`→`webp`). No valid entries → rxddit link.
-2. `src.is_video` or `src.domain === "v.redd.it"` → rxddit link.
+1. `src.is_gallery`: for each `src.gallery_data.items` (in order) take `src.media_metadata[item.media_id]`, skipping entries whose `status !== "valid"`; URL is `s.gif` when present, otherwise `https://i.redd.it/<media_id>.<ext>` with `ext` from `m` (`image/jpg`→`jpg`, `image/png`→`png`, `image/gif`→`gif`, `image/webp`→`webp`). No valid entries → vxreddit link.
+2. `src.is_video` or `src.domain === "v.redd.it"` → vxreddit link.
 3. `src.domain === "i.redd.it"` or `src.post_hint === "image"` → files `[src.url]`.
-4. `src.is_self` → rxddit link.
+4. `src.is_self` → vxreddit link.
 5. `src.url` not on `reddit.com` / `redd.it` → link `src.url`.
-6. Otherwise → rxddit link.
+6. Otherwise → vxreddit link.
 
-rxddit link = `https://rxddit.com` + `src.permalink`. `fallback` for files is that rxddit link. The rxddit host is one constant (`EMBED_HOST`) so it can be swapped if the service dies.
+vxreddit link = `https://vxreddit.com` + `src.permalink`. `fallback` for files is that vxreddit link. The vxreddit host is one constant (`EMBED_HOST`) so it can be swapped if the service dies.
 
-If the JSON fetch fails, send the rxddit link built from the DOM's `data-permalink`.
+If the JSON fetch fails, send the vxreddit link built from the DOM's `data-permalink`.
 
 ## Sending files
 
