@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "test": "node --test",
-    "lint": "npx web-ext lint --source-dir . --ignore-files \"test/**\" \"docs/**\" \"*.md\" package.json",
+    "lint": "npx web-ext lint --source-dir . --ignore-files \"test/**\" \"docs/**\" \"scripts/**\" \"*.md\" package.json \".env*\" .amo-upload-uuid",
     "start": "npx web-ext run --source-dir . --start-url https://x.com/home",
-    "sign": "npx web-ext sign --channel=unlisted --source-dir . --ignore-files \"test/**\" \"docs/**\" \"*.md\" package.json"
+    "sign": "node --env-file-if-exists=.env scripts/sign.js"
   }
 }

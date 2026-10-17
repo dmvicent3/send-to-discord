@@ -59,9 +59,5 @@ npm start       # launches a temporary Firefox profile with the extension loaded
 Firefox release only keeps signed add-ons. This one is signed as **unlisted** on addons.mozilla.org: it is never shown in the public catalogue.
 
 1. Create API credentials at https://addons.mozilla.org/developers/addon/api/key/.
-2. Put them in the environment (never commit them), e.g. in PowerShell:
-   ```powershell
-   $env:WEB_EXT_API_KEY = "user:12345:67"
-   $env:WEB_EXT_API_SECRET = "..."
-   ```
-3. Bump `version` in `manifest.json` (AMO rejects a version it has already signed), then `npm run sign`. The `.xpi` lands in `web-ext-artifacts/`.
+2. Copy `.env.example` to `.env` and fill in `WEB_EXT_API_KEY` (the JWT issuer) and `WEB_EXT_API_SECRET` (the JWT secret). `.env` is git-ignored and excluded from the signed package; variables set in the shell work too.
+3. Bump `version` in `manifest.json` (AMO rejects a version it has already signed), then `npm run sign`, which loads `.env` and runs `web-ext sign` via `scripts/sign.js`. The `.xpi` lands in `web-ext-artifacts/`.
