@@ -30,7 +30,7 @@ Success: on `www.youtube.com/watch`, two clicks on the Discord button put `https
 
 ## Button
 
-- Anchor: YouTube's Share button in the watch page's action row (inside `ytd-watch-metadata`). The adapter finds the Share button and clones its outermost wrapper that is a direct child of the row, the way `x.js` clones X's share slot. The clone has YouTube's ids, `aria-*` and test attributes stripped and gains class `s2d-yt`.
+- Anchor: YouTube's Share button in the watch page's action row (inside `ytd-watch-metadata`). The adapter clones the Share wrapper's plain `<button>` (it carries YouTube's `yt-spec-button-shape-next` styling classes) into a plain `<div class="s2d-yt">`. The wrapper itself is a YouTube custom element and is not cloned: cloning it would re-run YouTube's rendering and overwrite the icon and label. The clone has `id`, `aria-*` and test attributes stripped.
 - The clone's icon is replaced with the Discord glyph (same path data as X, `fill="currentColor"`), and its text becomes the state label.
 - Inserted directly after the Share wrapper. When YouTube shows Download, Clip or Save after Share, the Discord button sits before them.
 - Idempotent: skip when the row already contains `.s2d-yt`. A `MutationObserver` with one scan per animation frame re-adds it after YouTube re-renders the row (navigation between videos, layout changes).
