@@ -32,8 +32,11 @@ function injectButton(thing) {
   if (!row || row.querySelector(".s2d-reddit")) return;
   const item = document.createElement("li");
   item.className = "s2d-reddit";
+  // No href: a "#" link scrolls to the top when the page's own handlers let the click through.
   const link = document.createElement("a");
-  link.href = "#";
+  link.setAttribute("role", "button");
+  link.tabIndex = 0;
+  link.style.cursor = "pointer";
   item.appendChild(link);
   row.appendChild(item);
   wireButton(link, {
