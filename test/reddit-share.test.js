@@ -29,8 +29,8 @@ test("gallery keeps order, skips failed items and prefers s.gif", () => {
   });
 });
 
-test("gallery with no valid items, video and self posts send the embed link", () => {
-  for (const [name, id] of [["gallery-empty", 4], ["video", 5], ["self", 7]]) {
+test("gallery with no valid items and self posts send the embed link", () => {
+  for (const [name, id] of [["gallery-empty", 4], ["self", 7]]) {
     assert.deepEqual(planRedditShare(post(name)), { type: "link", url: `https://vxreddit.com/r/pics/comments/${id}/t/` }, name);
   }
 });
@@ -47,6 +47,10 @@ test("crosspost of an image uploads the parent's file with the parent's fallback
   });
 });
 
-test("crosspost of a video sends the parent's embed link", () => {
-  assert.deepEqual(planRedditShare(post("crosspost-video")), { type: "link", url: "https://vxreddit.com/r/pics/comments/5/t/" });
+test("video post is uploaded from its embed page", () => {
+  assert.deepEqual(planRedditShare(post("video")), { type: "video", page: "https://vxreddit.com/r/pics/comments/5/t/" });
+});
+
+test("crosspost of a video uploads the parent's video", () => {
+  assert.deepEqual(planRedditShare(post("crosspost-video")), { type: "video", page: "https://vxreddit.com/r/pics/comments/5/t/" });
 });

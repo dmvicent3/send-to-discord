@@ -81,10 +81,11 @@ async function sendFilesToWebhook(webhookUrl, files, fetchImpl = fetch) {
 
 async function download(url, fetchImpl) {
   try {
-    const response = await fetchImpl(url);
+    // no-store: media is held in memory only, never written to the HTTP cache on disk.
+    const response = await fetchImpl(url, { cache: "no-store" });
     if (!response.ok) return null;
     if (Number(response.headers.get("Content-Length")) > MAX_DOWNLOAD_BYTES) return null;
-    return { name: fileNameFromUrl(url), blob: await response.blob() };
+    return { name: fileNameFromUrl(response.url || url), blob: await response.blob() };
   } catch (error) {
     console.warn("x-to-discord: download failed", url, error);
     return null;
@@ -105,4 +106,31 @@ async function sendFiles(webhookUrl, urls, fallback, fetchImpl = fetch) {
   return result.skipped.length ? sendToWebhook(webhookUrl, fallback, fetchImpl) : { ok: true };
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeWebhookUrl, sendToWebhook, fileNameFromUrl, sendFilesToWebhook, sendFiles };
+const ENTITIES = { "&amp;": "&", "&quot;": '"', "&#39;": "'", "&lt;": "<", "&gt;": ">" };
+
+// The https URL in a page's <meta property="og:video" content="..."> tag, or null.
+function ogVideoUrl(html) {
+  for (const [tag] of html.matchAll(/<meta\b[^>]*>/gi)) {
+    const attrs = Object.fromEntries([...tag.matchAll(/([\w:-]+)\s*=\s*"([^"]*)"/g)].map(([, name, value]) => [name.toLowerCase(), value]));
+    if (attrs.property !== "og:video" || !attrs.content) continue;
+    const url = attrs.content.replace(/&(?:amp|quot|#39|lt|gt);/g, (entity) => ENTITIES[entity]);
+    return url.startsWith("https://") ? url : null;
+  }
+  return null;
+}
+
+// Uploads the video an embed page offers (its og:video); anything that keeps it from uploading sends the page link.
+async function sendVideo(webhookUrl, page, fetchImpl = fetch) {
+  let videoUrl = null;
+  try {
+    const response = await fetchImpl(page, { cache: "no-store" });
+    if (response.ok) videoUrl = ogVideoUrl(await response.text());
+  } catch (error) {
+    console.warn("x-to-discord: embed page fetch failed", page, error);
+  }
+  return videoUrl ? sendFiles(webhookUrl, [videoUrl], page, fetchImpl) : sendToWebhook(webhookUrl, page, fetchImpl);
+}
+
+if (typeof module !== "undefined") {
+  module.exports = { normalizeWebhookUrl, sendToWebhook, fileNameFromUrl, sendFilesToWebhook, sendFiles, ogVideoUrl, sendVideo };
+}

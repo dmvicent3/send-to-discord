@@ -1,4 +1,4 @@
-// Decides what a Reddit post becomes in Discord: uploaded image files, or a link that embeds.
+// Decides what a Reddit post becomes in Discord: uploaded image or video files, or a link that embeds.
 
 const EMBED_HOST = "vxreddit.com";
 
@@ -37,7 +37,7 @@ function planRedditShare(post) {
     const urls = galleryUrls(src);
     return urls.length ? files(urls) : link;
   }
-  if (src.is_video || src.domain === "v.redd.it") return link;
+  if (src.is_video || src.domain === "v.redd.it") return { type: "video", page: link.url };
   if (src.domain === "i.redd.it" || src.post_hint === "image") return files([src.url]);
   if (src.is_self) return link;
   if (src.url && !isRedditHost(src.url)) return { type: "link", url: src.url };

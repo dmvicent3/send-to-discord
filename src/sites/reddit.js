@@ -18,9 +18,9 @@ async function resolvePost(permalink) {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const json = await response.json();
     const plan = planRedditShare(json[0].data.children[0].data);
-    return plan.type === "files"
-      ? { type: "send-files", urls: plan.urls, fallback: plan.fallback }
-      : { type: "send", url: plan.url };
+    if (plan.type === "files") return { type: "send-files", urls: plan.urls, fallback: plan.fallback };
+    if (plan.type === "video") return { type: "send-video", page: plan.page };
+    return { type: "send", url: plan.url };
   } catch (error) {
     console.warn("x-to-discord: post lookup failed, sending the embed link", error);
     return { type: "send", url: embedLink(permalink) };

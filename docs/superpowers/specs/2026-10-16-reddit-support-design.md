@@ -17,7 +17,7 @@ Success: on an RES old-layout listing or post page, two clicks on `discord` put 
 | Destination | Same single webhook as X |
 | Image/GIF post | Upload the file; message has no text |
 | Gallery | Upload images, 10 per message, more messages if needed; no text |
-| Reddit video | Link `https://vxreddit.com<permalink>` |
+| Reddit video | Upload the merged mp4 (video + audio) that the vxreddit page offers as `og:video`; downloaded in memory with `cache: "no-store"`. No mp4, failed download or too large → link `https://vxreddit.com<permalink>` |
 | External link post | The external URL as-is |
 | Text post / anything else | vxreddit link |
 | Crosspost | Decide and build from the crosspost parent |
@@ -51,7 +51,7 @@ On the second click the adapter reads `data-permalink` from the post and fetches
 `planRedditShare(post) -> { type: "files", urls: string[], fallback: string } | { type: "link", url: string }`, in this order:
 
 1. `src.is_gallery`: for each `src.gallery_data.items` (in order) take `src.media_metadata[item.media_id]`, skipping entries whose `status !== "valid"`; URL is `s.gif` when present, otherwise `https://i.redd.it/<media_id>.<ext>` with `ext` from `m` (`image/jpg`→`jpg`, `image/png`→`png`, `image/gif`→`gif`, `image/webp`→`webp`). No valid entries → vxreddit link.
-2. `src.is_video` or `src.domain === "v.redd.it"` → vxreddit link.
+2. `src.is_video` or `src.domain === "v.redd.it"` → `{ type: "video", page: <vxreddit link> }`; the background fetches the page, uploads its `og:video` mp4 via `sendFiles` with the page link as fallback (message `{ type: "send-video", page }`).
 3. `src.domain === "i.redd.it"` or `src.post_hint === "image"` → files `[src.url]`.
 4. `src.is_self` → vxreddit link.
 5. `src.url` not on `reddit.com` / `redd.it` → link `src.url`.
@@ -70,7 +70,7 @@ New message `{ type: "send-files", urls, fallback }`. Background:
 3. HTTP 413 on a batch → split it in half and retry each half, in order; a single file that still gets 413 is skipped. If any file was skipped, send `fallback` as a link after the images that did post (only the link when none did). Other non-2xx → `{ ok: false, reason: "HTTP <status>" }`; network error → `reason: "network"`.
 4. Every JSON message sets `allowed_mentions: { parse: [] }`, so a link containing `@everyone` pings no one.
 
-`host_permissions` gain `https://i.redd.it/*` and `https://preview.redd.it/*` (downloads come from the background, where CORS does not apply with host permission). `data_collection_permissions.required` gains `websiteContent`.
+`host_permissions` gain `https://i.redd.it/*`, `https://preview.redd.it/*`, and for videos `https://vxreddit.com/*`, `https://renders.vxreddit.com/*` and `https://*.lambda-url.us-east-1.on.aws/*` (vxreddit.com redirects through its AWS Lambda converter to renders.vxreddit.com) (downloads come from the background, where CORS does not apply with host permission). `data_collection_permissions.required` gains `websiteContent`.
 
 ## Rename
 
@@ -89,4 +89,4 @@ New message `{ type: "send-files", urls, fallback }`. Background:
 
 ## Out of scope
 
-New Reddit design, uploading videos (audio is a separate stream), titles or text in messages, sharing comments, per-site webhooks.
+New Reddit design, merging video and audio ourselves (vxreddit does it), titles or text in messages, sharing comments, per-site webhooks.

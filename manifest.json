@@ -18,7 +18,10 @@
     "https://ptb.discord.com/api/webhooks/*",
     "https://canary.discord.com/api/webhooks/*",
     "https://i.redd.it/*",
-    "https://preview.redd.it/*"
+    "https://preview.redd.it/*",
+    "https://vxreddit.com/*",
+    "https://renders.vxreddit.com/*",
+    "https://*.lambda-url.us-east-1.on.aws/*"
   ],
   "background": { "scripts": ["src/core/webhook.js", "src/background.js"] },
   "options_ui": { "page": "src/options.html", "open_in_tab": false },

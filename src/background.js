@@ -17,6 +17,11 @@ browser.runtime.onMessage.addListener(async (message) => {
       if (!webhook) return { ok: false, reason: "no webhook" };
       return sendFiles(webhook, message.urls, message.fallback);
     }
+    case "send-video": {
+      const webhook = await storedWebhook();
+      if (!webhook) return { ok: false, reason: "no webhook" };
+      return sendVideo(webhook, message.page);
+    }
     case "open-options":
       await browser.runtime.openOptionsPage();
       return undefined;

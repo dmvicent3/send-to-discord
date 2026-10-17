@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { normalizeWebhookUrl, sendToWebhook, fileNameFromUrl, sendFilesToWebhook, sendFiles } = require("../src/core/webhook.js");
+const { normalizeWebhookUrl, sendToWebhook, fileNameFromUrl, sendFilesToWebhook, sendFiles, ogVideoUrl, sendVideo } = require("../src/core/webhook.js");
 
 const HOOK = "https://discord.com/api/webhooks/1/abc";
 const LINK = "https://fxtwitter.com/jack/status/20";
@@ -72,17 +72,19 @@ const FALLBACK = "https://vxreddit.com/r/pics/comments/1/t/";
 function routedFetch({ hook = () => new Response(null, { status: 204 }), files = {} } = {}) {
   const posts = [];
   const downloads = [];
+  const downloadInits = [];
   const fn = async (url, init) => {
     if (url === HOOK) {
       posts.push(init);
       return hook(init);
     }
     downloads.push(url);
+    downloadInits.push(init);
     const file = files[url];
     if (!file) return new Response("missing", { status: 404 });
     return typeof file === "function" ? file() : file;
   };
-  return { fn, posts, downloads };
+  return { fn, posts, downloads, downloadInits };
 }
 
 const blobFile = (name) => ({ name, blob: new Blob([name], { type: "image/jpeg" }) });
@@ -216,4 +218,66 @@ test("sendFiles sends the fallback link when the upload is too large", async () 
   assert.deepEqual(await sendFiles(HOOK, [IMG], FALLBACK, fetch.fn), { ok: true });
   assert.equal(fetch.posts.length, 2);
   assert.ok(isFallback(fetch.posts[1]));
+});
+
+test("downloads bypass the HTTP cache so media never lands on disk", async () => {
+  const fetch = routedFetch({ files: { [IMG]: image } });
+  await sendFiles(HOOK, [IMG], FALLBACK, fetch.fn);
+  assert.equal(fetch.downloadInits[0]?.cache, "no-store");
+});
+
+test("downloaded files are named after the final URL after redirects", async () => {
+  const START = "https://vxreddit.com/redditvideo.mp4?video_url=x";
+  const redirected = () => ({
+    ok: true,
+    status: 200,
+    url: "https://renders.vxreddit.com/t2q.mp4",
+    headers: new Headers({ "Content-Length": "3" }),
+    blob: async () => new Blob(["mp4"], { type: "video/mp4" }),
+  });
+  const fetch = routedFetch({ files: { [START]: redirected } });
+  await sendFiles(HOOK, [START], FALLBACK, fetch.fn);
+  assert.equal(fetch.posts[0].body.get("files[0]").name, "t2q.mp4");
+});
+
+const PAGE = "https://vxreddit.com/r/pics/comments/5/t/";
+const MP4 = "https://vxreddit.com/redditvideo.mp4?video_url=a&audio_url=b";
+const pageWith = (meta) => () => new Response(`<html><head>${meta}</head></html>`, { headers: { "Content-Type": "text/html" } });
+const VIDEO_META = '<meta property="og:video" content="https://vxreddit.com/redditvideo.mp4?video_url=a&amp;audio_url=b" />';
+
+test("ogVideoUrl reads and unescapes the og:video URL in either attribute order", () => {
+  assert.equal(ogVideoUrl(VIDEO_META), MP4);
+  assert.equal(ogVideoUrl('<meta content="https://x.test/v.mp4" property="og:video">'), "https://x.test/v.mp4");
+  assert.equal(ogVideoUrl('<meta property="og:video:type" content="video/mp4" />'), null);
+  assert.equal(ogVideoUrl('<meta property="og:video" content="javascript:alert(1)" />'), null);
+  assert.equal(ogVideoUrl("<html></html>"), null);
+});
+
+test("sendVideo uploads the page's og:video file without sending the link", async () => {
+  const fetch = routedFetch({ files: { [PAGE]: pageWith(VIDEO_META), [MP4]: image } });
+  assert.deepEqual(await sendVideo(HOOK, PAGE, fetch.fn), { ok: true });
+  assert.equal(fetch.posts.length, 1);
+  assert.ok(fetch.posts[0].body instanceof FormData);
+  assert.equal(fetch.downloadInits[0]?.cache, "no-store");
+});
+
+test("sendVideo sends the page link when the page has no video", async () => {
+  const fetch = routedFetch({ files: { [PAGE]: pageWith('<meta property="og:image" content="https://x.test/a.png" />') } });
+  assert.deepEqual(await sendVideo(HOOK, PAGE, fetch.fn), { ok: true });
+  assert.deepEqual(fetch.posts.map((init) => JSON.parse(init.body).content), [PAGE]);
+});
+
+test("sendVideo sends the page link when the page cannot be fetched", async () => {
+  const fetch = routedFetch();
+  assert.deepEqual(await sendVideo(HOOK, PAGE, fetch.fn), { ok: true });
+  assert.deepEqual(fetch.posts.map((init) => JSON.parse(init.body).content), [PAGE]);
+});
+
+test("sendVideo sends the page link when Discord refuses the video as too large", async () => {
+  const fetch = routedFetch({
+    files: { [PAGE]: pageWith(VIDEO_META), [MP4]: image },
+    hook: (init) => new Response(null, { status: init.body instanceof FormData ? 413 : 204 }),
+  });
+  assert.deepEqual(await sendVideo(HOOK, PAGE, fetch.fn), { ok: true });
+  assert.equal(JSON.parse(fetch.posts.at(-1).body).content, PAGE);
 });
