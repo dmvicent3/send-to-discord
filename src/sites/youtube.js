@@ -2,8 +2,9 @@
 
 const STYLE = `
 .s2d-yt { margin-left: 8px; display: flex; }
-.s2d-yt svg { width: 24px; height: 24px; }
-.s2d-yt button { transition: color 0.2s, opacity 0.2s; }
+.s2d-yt .yt-spec-button-shape-next__icon { display: flex; width: 24px; height: 24px; margin: 0; }
+.s2d-yt svg { display: block; width: 24px; height: 24px; }
+.s2d-yt button { display: flex; align-items: center; justify-content: center; padding: 0; transition: color 0.2s, opacity 0.2s; }
 .s2d-yt[data-state="armed"] button,
 .s2d-yt[data-state="sending"] button { color: #5865F2 !important; }
 .s2d-yt[data-state="sending"] button { opacity: 0.5; }
