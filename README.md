@@ -1,6 +1,6 @@
-# X to Discord
+# Send to Discord
 
-Firefox extension that adds a Discord button to every post on X. Click it once to arm it, click again to send: the post's link, rewritten to `fxtwitter.com` so Discord shows a full embed, is posted to one Discord channel through a webhook.
+Firefox extension that adds a Discord button to posts on X and on old-layout Reddit. Click it once to arm it, click again to send the post to one Discord channel through a webhook.
 
 ## Install
 
@@ -12,12 +12,31 @@ The webhook URL is stored only in your browser (`browser.storage.local`).
 
 ## Use
 
+### X
+
 | Button | Meaning |
 |---|---|
 | grey Discord icon | ready, click to arm |
 | blurple arrow | armed: click again within 3 s to send |
 | green check | sent |
 | red cross | failed, hover for the reason |
+
+The post's link is sent rewritten to `fxtwitter.com`, so Discord shows a full embed.
+
+### Reddit
+
+Needs the old layout: `old.reddit.com`, or `www.reddit.com` with RES (Reddit Enhancement Suite) showing the classic look. A `discord` link appears at the end of each post's link row: `discord` → `send?` (click again within 3 s) → `sending…` → `sent ✓` or `failed: <reason>`.
+
+| Post | What Discord gets |
+|---|---|
+| Image or GIF | the file, uploaded, no text |
+| Gallery | the images, 10 per message |
+| Reddit video | an `rxddit.com` link (plays with sound) |
+| External link | that link |
+| Text post | an `rxddit.com` link |
+| Crosspost | the same, for the original post |
+
+If an image is too large for Discord or fails to download, the `rxddit.com` link is sent instead.
 
 If no webhook is set, the button opens the options page.
 

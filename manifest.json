@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "X to Discord",
-  "version": "0.1.0",
-  "description": "Adds a button to X posts that sends the fxtwitter link to a Discord webhook.",
+  "name": "Send to Discord",
+  "version": "0.2.0",
+  "description": "Adds a button to X and Reddit posts that sends them to a Discord webhook.",
   "browser_specific_settings": {
     "gecko": {
       "id": "x-to-discord@dmvicent3",

@@ -1,6 +1,6 @@
-# X to Discord
+# Send to Discord
 
-Personal Firefox (MV3) extension: a button on each X post that sends its link, rewritten to `fxtwitter.com`, to one Discord webhook. Plain JavaScript, no bundler.
+Personal Firefox (MV3) extension: a button on each X post and old-layout Reddit post that sends it to one Discord webhook (X as an `fxtwitter.com` link; Reddit as uploaded images or an `rxddit.com`/external link). Plain JavaScript, no bundler.
 
 ## Done means green
 

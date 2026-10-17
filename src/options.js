@@ -23,6 +23,6 @@ document.getElementById("test").addEventListener("click", async () => {
     return;
   }
   status.textContent = "Sending…";
-  const result = await sendToWebhook(webhookUrl, "X to Discord: test message");
+  const result = await sendToWebhook(webhookUrl, "Send to Discord: test message");
   status.textContent = result.ok ? "Test sent" : `Failed: ${result.reason}`;
 });
