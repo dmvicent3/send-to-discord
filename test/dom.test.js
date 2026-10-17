@@ -2,23 +2,7 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { findPermalink, findActionBar, findSlot, iconShift, nextMargin } = require("../src/sites/x-dom.js");
 
-// Minimal element stand-in exposing the DOM properties dom.js relies on.
-function h(tag, attrs = {}, ...children) {
-  const node = {
-    tagName: tag.toUpperCase(),
-    attrs,
-    children,
-    parentElement: null,
-    get childElementCount() {
-      return this.children.length;
-    },
-    getAttribute(name) {
-      return name in this.attrs ? this.attrs[name] : null;
-    },
-  };
-  for (const child of children) child.parentElement = node;
-  return node;
-}
+const { h } = require("./helpers/fake-dom.js");
 
 const actionBar = () =>
   h("div", { role: "group" },
